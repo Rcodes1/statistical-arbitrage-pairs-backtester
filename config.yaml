@@ -1,0 +1,29 @@
+#Central config file for the entire pairs trading backtester
+#Keeping variables here so I dont have to touch the source code to change settings
+
+universe:
+  sector: "UK Banks"
+  # using UK banks, so appending .L is required for yfinance to reach the london stock exchange
+  tickers:
+    - "BARC.L" # Barclays
+    - "LLOY.L" # Lloyds
+    - "NWG.L" # NatWest
+    - "HSBA.L" #HSBC
+    - "STAN.L" # Standard Chartered
+
+data:
+  start_date: "2019-01-01"
+  end_date: "2024-01-01"
+  price_field: "Close"
+
+cointegration:
+  p_value_threshold: 0.05 # Standard 95% confidence level boundary
+
+zscore:
+  lookback_window: 30  # 30 trading days for rolling mean % std spread
+  entry_threshold: 2.0  # open opsitions when z score croses +/- 2 std
+  exit_threshold: 0.5  # close positions when spread pulls back near mean
+
+portfolio:
+  initial_capital: 100000.0  #starting cash balance
+  transaction_cost: 0.001   # 0.1% execution fee per trade
