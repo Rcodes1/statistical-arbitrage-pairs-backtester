@@ -29,29 +29,33 @@ def find_tradable_pairs(prices, threshold):
     """
     from statsmodels.tsa.stattools import coint
     tickers = prices.columns
+    n = len(tickers)
     valid_pairs = []
     matrix = pd.DataFrame(index=tickers, columns=tickers)
 
-    #loops through every stock (rows)
-    for ticker_A in tickers:
-        #loops through every stock (columns)
-        for ticker_B in tickers:
-            #skips comparing stock to itself
-            if ticker_A == ticker_B:
-                matrix.loc[ticker_A, ticker_B] = 1.0
+    # fills diagonal with 1.0 (where asset is compared with it self)
+    for ticker in tickers:
+        matrix.loc[ticker,ticker] = 1.0
+
+    #iterates through all but last asset
+    for idx_A in range(n):
+        #iterates only through assets after current asset
+        for idx_B in range(idx_A + 1, n):
+            ticker_A = tickers[idx_A]
+            ticker_B = tickers[idx_B]
             
-            else:
-                #runs statistical test and uses only p-value
-                _, p_value, _ = coint(prices[ticker_A], prices[ticker_B])
-                #saves p-value into matrix
-                matrix.loc[ticker_A, ticker_B] = p_value
+            #performs cointegration test
+            _, p_value, _ = coint(prices[ticker_A], prices[ticker_B])
                 
-                if p_value < threshold:
-                    valid_pairs.append({
-                        "Asset A": ticker_A,
-                        "Asset B": ticker_B,
-                        "P-Value": round(p_value,4)
-                    })
+            #saves p-value into matrix symemtrically
+            matrix.loc[[ticker_A, ticker_B] , [ticker_B, ticker_A]] = p_value
+                
+            if p_value < threshold:
+                valid_pairs.append({
+                    "Asset A": ticker_A,
+                    "Asset B": ticker_B,
+                    "P-Value": round(p_value,4)
+                })
     return matrix , pd.DataFrame(valid_pairs)
 
 if __name__ == "__main__":
