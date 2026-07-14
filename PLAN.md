@@ -41,6 +41,8 @@ Takes verified stock pairs from 2. and calculates their historical price gap (sp
 - Runs an ordinary least squares (OLS) regression using `statsmodels` to find hedge ratio (hedge ratio represents relationship slope between two assets)
 - __Returns__ hedge ratio float value
 
+$$Y = \beta X + \alpha$$
+
 #### Function no.2 - `calculate_spread()`
 - Takes the prices of Asset A, Asset B and the calculated hedge ratio
 - Subtracts the scaled price of Asset B from Asset A (spread = stock A - (Hedge ratio * Stock B))
