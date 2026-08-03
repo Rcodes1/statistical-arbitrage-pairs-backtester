@@ -19,11 +19,15 @@ data:
 cointegration:
   p_value_threshold: 0.05 # Standard 95% confidence level boundary
 
+strategy:
+  hedge_lookback: 60 # 60 day rolling OLS window
 zscore:
   lookback_window: 30  # 30 trading days for rolling mean % std spread
   entry_threshold: 2.0  # open opsitions when z score croses +/- 2 std
   exit_threshold: 0.5  # close positions when spread pulls back near mean
+  stop_loss_threshold: 3.5 # harf stop loss to force exit
 
 portfolio:
   initial_capital: 100000.0  #starting cash balance
   transaction_cost: 0.001   # 0.1% execution fee per trade
+  short_borrow_fee : 0.01 # 1.0% annual cost to borrow short legs
