@@ -17,15 +17,13 @@ data:
   price_field: "Close"
 
 cointegration:
-  p_value_threshold: 0.01 # Standard 95% confidence level boundary
+  p_value_threshold: 0.05 # Standard 95% confidence level boundary
 
 zscore:
-  lookback_window: 60  # 30 trading days for rolling mean % std spread
+  lookback_window: 30  # 30 trading days for rolling mean % std spread
   entry_threshold: 2.0  # open opsitions when z score croses +/- 2 std
   exit_threshold: 0.5  # close positions when spread pulls back near mean
-  stop_loss_threshold: 3.5 #hard exit if relationship breaks down
 
 portfolio:
   initial_capital: 100000.0  #starting cash balance
   transaction_cost: 0.001   # 0.1% execution fee per trade
-  short_borrow_fee: 0.01 #1.0% annual cost to borrow short legs
