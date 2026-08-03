@@ -2,6 +2,9 @@ import os
 import yaml
 import yfinance as yf
 import pandas as pd
+import statsmodels.api as sm
+from statsmodels.tsa.stattools import coint
+
 
 # finds the folder where this script is currently
 script_dir = os.path.dirname(__file__)
@@ -27,7 +30,6 @@ def find_tradable_pairs(prices, threshold):
     """
     screens all asset combinations for cointegration and extracts pairs falling below p-value threshold
     """
-    from statsmodels.tsa.stattools import coint
     tickers = prices.columns
     n = len(tickers)
     valid_pairs = []
@@ -54,7 +56,7 @@ def find_tradable_pairs(prices, threshold):
                 valid_pairs.append({
                     "Asset_A": ticker_A,
                     "Asset_B": ticker_B,
-                    "P-Value": round(p_value,4)
+                    "P-Value": round(p_value,4),
                 })
     return matrix , pd.DataFrame(valid_pairs)
 
@@ -65,9 +67,6 @@ if __name__ == "__main__":
     prices = download_market_data(tickers, config["data"]["start_date"], config["data"]["end_date"])
 
     p_value_matrix, results = find_tradable_pairs(prices, threshold = p_value_threshold)
-    
-    p_value_matrix.index.name = None
-    p_value_matrix.columns.name = None
 
     output_dir = os.path.join(script_dir,"..", "data")
     os.makedirs(output_dir, exist_ok=True)
@@ -78,11 +77,13 @@ if __name__ == "__main__":
     if not results.empty:
         #sorts pairs so lowest p-value is at Row 0 
         results = results.sort_values(by="P-Value", ascending=True)
-
         results.to_csv(os.path.join(output_dir, "top_cointegrated_pairs.csv"), index=False)
         
+        p_value_matrix.index.name = None
+        p_value_matrix.columns.name = None
+
         print(f"\n COINTEGRATION P-VALUE MATRIX \n{p_value_matrix.astype(float).round(4)}")
 
         print(f"\n SIGNIFICANT COINTEGRATION PAIRS \n{results.to_string(index=False)}")
     else:
-        print(f"No cointegration pairs found matching your criteria (p < {p_value_threshold}) \n {p_value_matrix}")
+        print(f"No cointegration pairs found matching your criteria (p < {p_value_threshold}) \n {p_value_matrix.astype(float).round(4)}")
